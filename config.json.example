@@ -1,9 +1,20 @@
 {
     "logging": {
-        "log_level": 20,
-        "gotify": {
-            "app_token": "",
-            "server_url": "https://gotify.example.com"
+        "version": 1,
+        "handlers": {
+            "ntfyHandler": {
+                "class": "ntfy_handler.NtfyHandler",
+                "level": "INFO",
+                "topic_name": "rit-auto-renew",
+            }
+        },
+        "loggers": {
+            "rit_auto_renew": {
+                "handlers": [
+                    "ntfyHandler"
+                ],
+                "level": "INFO"
+            }
         }
     },
     "username": "abc1234",

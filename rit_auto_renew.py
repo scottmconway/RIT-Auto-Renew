@@ -3,6 +3,7 @@
 import argparse
 import json
 import logging
+import logging.config
 import re
 from time import sleep
 
@@ -13,7 +14,7 @@ from selenium.webdriver.common.keys import Keys
 SHIB_LOGIN_URL = (
     "https://start.rit.edu/Shibboleth.sso/Login?target=https://start.rit.edu/Alumni"
 )
-SHIB_LOGIN_ERR_URL = 'https://shibboleth.main.ad.rit.edu/idp/profile/SAML2/Redirect/SSO'
+SHIB_LOGIN_ERR_URL = "https://shibboleth.main.ad.rit.edu/idp/profile/SAML2/Redirect/SSO"
 ACCOUNT_RENEWED_REGEX = re.compile(
     r".*<p>Your alumni account has been renewed until ([0-9]{4}\-[0-9]{2}\-[0-9]{2})\.</p>.*"
 )
@@ -33,13 +34,8 @@ def main():
         config = json.load(f)
 
     logger = logging.getLogger("rit_auto_renew")
-    logging.basicConfig()
     logging_conf = config.get("logging", dict())
-    logger.setLevel(logging_conf.get("log_level", logging.INFO))
-    if "gotify" in logging_conf:
-        from gotify_handler import GotifyHandler
-
-        logger.addHandler(GotifyHandler(**logging_conf["gotify"]))
+    logging.config.dictConfig(logging_conf)
 
     try:
         chrome_options = webdriver.ChromeOptions()
@@ -57,8 +53,8 @@ def main():
         sleep(10)
 
         # check if we're still at the login page
-        if driver.current_url.split('?')[0] == SHIB_LOGIN_ERR_URL:
-            logger.error('Error logging into Shibboleth - exiting')
+        if driver.current_url.split("?")[0] == SHIB_LOGIN_ERR_URL:
+            logger.error("Error logging into Shibboleth - exiting")
             return
 
         # click the "renew" button
